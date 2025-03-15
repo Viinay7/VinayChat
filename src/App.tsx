@@ -5,7 +5,7 @@ import Sidebar from "./components/Sidebar";
 import Profile from "./components/Profile";
 
 // API Configuration
-const API_KEY: string = "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"; // Replace with your actual API key
+const API_KEY: string = "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"; // Replace with your actual API key
 const API_URL: string = "https://openrouter.ai/api/v1/chat/completions"; 
 const MODEL: string = "openai/chatgpt-4o-latest"; 
 
