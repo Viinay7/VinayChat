@@ -1,4 +1,3 @@
-// filepath: [App.tsx](http://_vscodecontentref_/1)
 import React, { useState } from "react";
 import { X, Menu } from "lucide-react";
 import ChatInterface from "./components/ChatInterface";
@@ -8,11 +7,10 @@ import Profile from "./components/Profile";
 // Load environment variables
 const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 const MODEL = import.meta.env.VITE_GEMMA_MODEL;
+const API_URL = "https://openrouter.ai/api/v1/chat/completions"; // 🔹 Fixed missing variable
 
-
-
-// Debugging: Check API Key and Model (Remove this in production)
-console.log("API Key:", API_KEY ? "Loaded Successfully" : "Missing");
+// Debugging: Check API Key and Model
+console.log("API Key:", API_KEY);
 console.log("Model:", MODEL);
 
 // Define message type
@@ -39,16 +37,14 @@ async function getChatResponse(userMessage: string): Promise<string> {
       body: JSON.stringify(payload),
     });
 
-    const responseText = await response.text();
-    console.log("API Response Text:", responseText);
+    const data = await response.json(); // 🔹 Fixed JSON parsing issue
+    console.log("API Response:", data);
 
     if (!response.ok) {
-      const errorData = JSON.parse(responseText);
-      console.error("API Error Response:", errorData);
+      console.error("API Error Response:", data);
       throw new Error(`API error: ${response.statusText}`);
     }
 
-    const data = JSON.parse(responseText);
     return data.choices[0].message.content;
   } catch (error) {
     console.error("Error fetching response:", error);
