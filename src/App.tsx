@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [showProfile, setShowProfile] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false); // Sidebar hidden by default on mobile
 
   // Save API Key
   const handleSaveKey = () => {
@@ -45,22 +45,22 @@ const App: React.FC = () => {
 
   // Fetch AI Response
   const getChatResponse = async (userMessage: string): Promise<string> => {
-    const userApiKey = localStorage.getItem("user_api_key"); // Get stored API key
+    const userApiKey = localStorage.getItem("user_api_key");
     if (!userApiKey) return "⚠️ API Key is missing! Please enter your key.";
 
     const payload = {
-      model: "mistralai/mistral-7b-instruct", // Replace with a valid model
+      model: "mistralai/mistral-7b-instruct",
       messages: [{ role: "user", content: userMessage }],
       max_tokens: 200,
     };
 
     try {
-      console.log("Using API Key:", userApiKey); // Debugging
+      console.log("Using API Key:", userApiKey);
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userApiKey}`, // Ensure correct format
+          Authorization: `Bearer ${userApiKey}`,
         },
         body: JSON.stringify(payload),
       });
@@ -82,6 +82,11 @@ const App: React.FC = () => {
     setShowProfile(!showProfile);
   };
 
+  // Toggle Sidebar (for mobile view)
+  const toggleSidebar = () => {
+    setShowSidebar(!showSidebar);
+  };
+
   // Start a New Chat
   const handleNewChat = () => {
     setMessages([]);
@@ -90,44 +95,79 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* API Key Input UI */}
-      {!apiKey ? (
-        <div className="p-4">
-          <input
-            type="text"
-            placeholder="Enter your API key"
-            value={inputKey}
-            onChange={(e) => setInputKey(e.target.value)}
-            className="border p-2"
+      {/* Sidebar - Hidden on small screens, visible on large screens */}
+      <div
+        className={`fixed inset-y-0 left-0 w-64 bg-white border-r transform ${
+          showSidebar ? "translate-x-0" : "-translate-x-full"
+        } transition-transform md:relative md:translate-x-0 md:w-64`}
+      >
+        <Sidebar showSidebar={showSidebar} handleNewChat={handleNewChat} />
+      </div>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col w-full h-screen overflow-hidden">
+        {/* API Key Input Section - Centered & Responsive */}
+        {!apiKey ? (
+          <div className="p-4 w-full flex flex-col items-center">
+            <input
+              type="text"
+              placeholder="Enter your API key"
+              value={inputKey}
+              onChange={(e) => setInputKey(e.target.value)}
+              className="border p-2 w-full max-w-xs"
+            />
+            <button
+              onClick={handleSaveKey}
+              className="mt-2 p-2 bg-blue-500 text-white w-full max-w-xs"
+            >
+              Save API Key
+            </button>
+          </div>
+        ) : (
+          <div className="p-4 flex items-center justify-between w-full">
+            <p>✅ API Key Set</p>
+            <button onClick={handleRemoveKey} className="p-2 bg-red-500 text-white">
+              Remove API Key
+            </button>
+          </div>
+        )}
+
+        {/* Chat Interface - Full Width for Mobile */}
+        <div className="flex-1 w-full">
+          <ChatInterface
+            messages={messages}
+            input={input}
+            setInput={setInput}
+            handleSendMessage={handleSendMessage}
           />
-          <button onClick={handleSaveKey} className="ml-2 p-2 bg-blue-500 text-white">
-            Save API Key
-          </button>
         </div>
-      ) : (
-        <div className="p-4">
-          <p>✅ API Key Set</p>
-          <button onClick={handleRemoveKey} className="ml-2 p-2 bg-red-500 text-white">
-            Remove API Key
-          </button>
+      </div>
+
+      {/* Profile Sidebar - Positioned Right & Responsive */}
+      {showProfile && (
+        <div className="fixed inset-y-0 right-0 w-64 bg-white border-l shadow-md">
+          <Profile showProfile={showProfile} toggleProfile={toggleProfile} />
         </div>
       )}
 
-      {/* Sidebar */}
-      <Sidebar showSidebar={showSidebar} handleNewChat={handleNewChat} />
-
-      {/* Chat Interface */}
-      <div className={`flex-1 flex flex-col ${showSidebar ? "md:ml-64" : ""}`}>
-        <ChatInterface
-          messages={messages}
-          input={input}
-          setInput={setInput}
-          handleSendMessage={handleSendMessage}
-        />
+      {/* Floating Buttons for Mobile View */}
+      <div className="fixed bottom-4 left-4 md:hidden">
+        <button
+          onClick={toggleSidebar}
+          className="p-3 bg-gray-800 text-white rounded-full shadow-lg"
+        >
+          ☰
+        </button>
       </div>
 
-      {/* Profile Sidebar */}
-      <Profile showProfile={showProfile} toggleProfile={toggleProfile} />
+      <div className="fixed bottom-4 right-4 md:hidden">
+        <button
+          onClick={toggleProfile}
+          className="p-3 bg-blue-500 text-white rounded-full shadow-lg"
+        >
+          👤
+        </button>
+      </div>
     </div>
   );
 };
