@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [showProfile, setShowProfile] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(false); // Sidebar hidden by default on mobile
+  const [showSidebar, setShowSidebar] = useState(false);
 
   // Save API Key
   const handleSaveKey = () => {
@@ -77,36 +77,20 @@ const App: React.FC = () => {
     }
   };
 
-  // Toggle Profile Sidebar
-  const toggleProfile = () => {
-    setShowProfile(!showProfile);
-  };
-
-  // Toggle Sidebar (for mobile view)
-  const toggleSidebar = () => {
-    setShowSidebar(!showSidebar);
-  };
-
-  // Start a New Chat
-  const handleNewChat = () => {
-    setMessages([]);
-    setInput("");
-  };
-
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar - Hidden on small screens, visible on large screens */}
+      {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 w-64 bg-white border-r transform ${
           showSidebar ? "translate-x-0" : "-translate-x-full"
         } transition-transform md:relative md:translate-x-0 md:w-64`}
       >
-        <Sidebar showSidebar={showSidebar} handleNewChat={handleNewChat} />
+        <Sidebar showSidebar={showSidebar} handleNewChat={() => setMessages([])} />
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col w-full h-screen overflow-hidden">
-        {/* API Key Input Section - Centered & Responsive */}
+      <div className="flex-1 flex flex-col h-full">
+        {/* API Key Input */}
         {!apiKey ? (
           <div className="p-4 w-full flex flex-col items-center">
             <input
@@ -116,10 +100,7 @@ const App: React.FC = () => {
               onChange={(e) => setInputKey(e.target.value)}
               className="border p-2 w-full max-w-xs"
             />
-            <button
-              onClick={handleSaveKey}
-              className="mt-2 p-2 bg-blue-500 text-white w-full max-w-xs"
-            >
+            <button onClick={handleSaveKey} className="mt-2 p-2 bg-blue-500 text-white w-full max-w-xs">
               Save API Key
             </button>
           </div>
@@ -132,41 +113,8 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Chat Interface - Full Width for Mobile */}
-        <div className="flex-1 w-full">
-          <ChatInterface
-            messages={messages}
-            input={input}
-            setInput={setInput}
-            handleSendMessage={handleSendMessage}
-          />
-        </div>
-      </div>
-
-      {/* Profile Sidebar - Positioned Right & Responsive */}
-      {showProfile && (
-        <div className="fixed inset-y-0 right-0 w-64 bg-white border-l shadow-md">
-          <Profile showProfile={showProfile} toggleProfile={toggleProfile} />
-        </div>
-      )}
-
-      {/* Floating Buttons for Mobile View */}
-      <div className="fixed bottom-4 left-4 md:hidden">
-        <button
-          onClick={toggleSidebar}
-          className="p-3 bg-gray-800 text-white rounded-full shadow-lg"
-        >
-          ☰
-        </button>
-      </div>
-
-      <div className="fixed bottom-4 right-4 md:hidden">
-        <button
-          onClick={toggleProfile}
-          className="p-3 bg-blue-500 text-white rounded-full shadow-lg"
-        >
-          👤
-        </button>
+        {/* Chat Interface */}
+        <ChatInterface messages={messages} input={input} setInput={setInput} handleSendMessage={handleSendMessage} />
       </div>
     </div>
   );
