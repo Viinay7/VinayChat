@@ -7,8 +7,8 @@ Here's a **well-structured and visually appealing README** for your **VChat** pr
 > **Test any LLM API in seconds – Use it as an LLM too!**  
 > **🔄 Daily Updates | 🔑 API Support | ⚡ Blazing Fast**  
 
-[![VChat Website](https://img.shields.io/badge/Try%20VChat-Click%20Here-brightgreen?style=for-the-badge)](https://your-vchat-link.com)  
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/your-repo-link)  
+[![VChat Website](https://img.shields.io/badge/Try%20VChat-Click%20Here-brightgreen?style=for-the-badge)](https://vinay-chat.vercel.app/)  
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/Viinay7/VinayChat)  
 
 ---
 
