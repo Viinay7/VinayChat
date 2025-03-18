@@ -4,10 +4,14 @@ import ChatInterface from "./components/ChatInterface";
 import Sidebar from "./components/Sidebar";
 import Profile from "./components/Profile";
 
-// API Configuration
-const API_KEY: string = "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"; // Replace with your actual API key
-const API_URL: string = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL: string = "google/gemma-3-1b-it:free";
+// API Configuration using environment variables
+const API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
+const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const MODEL = process.env.NEXT_PUBLIC_GEMMA_MODEL || "google/gemma-3-1b-it:free";
+
+// Debugging: Check API Key and Model (Remove this in production)
+console.log("API Key:", API_KEY ? "Loaded Successfully" : "Missing");
+console.log("Model:", MODEL);
 
 // Define message type
 interface ChatMessage {
@@ -15,16 +19,11 @@ interface ChatMessage {
   content: string;
 }
 
-// Function to fetch response from OpenRouter API (Google Gemma 3 1B)
+// Function to fetch response from OpenRouter API
 async function getChatResponse(userMessage: string): Promise<string> {
   const payload = {
     model: MODEL,
-    messages: [
-      {
-        role: "user",
-        content: [{ type: "text", text: userMessage }],
-      },
-    ],
+    messages: [{ role: "user", content: userMessage }],
     max_tokens: 200,
   };
 
@@ -38,16 +37,16 @@ async function getChatResponse(userMessage: string): Promise<string> {
       body: JSON.stringify(payload),
     });
 
-    const responseText = await response.text(); // Get response as text
-    console.log("API Response Text:", responseText); // Log the response text
+    const responseText = await response.text();
+    console.log("API Response Text:", responseText);
 
     if (!response.ok) {
-      const errorData = JSON.parse(responseText); // Parse error response
+      const errorData = JSON.parse(responseText);
       console.error("API Error Response:", errorData);
       throw new Error(`API error: ${response.statusText}`);
     }
 
-    const data = JSON.parse(responseText); // Parse successful response
+    const data = JSON.parse(responseText);
     return data.choices[0].message.content;
   } catch (error) {
     console.error("Error fetching response:", error);
@@ -67,7 +66,6 @@ const App: React.FC = () => {
       setMessages([...messages, userMessage]);
       setInput("");
 
-      // Fetch response from OpenRouter API
       const botResponse = await getChatResponse(input);
       setMessages((prev) => [...prev, { role: "assistant", content: botResponse }]);
     }
@@ -107,7 +105,7 @@ const App: React.FC = () => {
           setInput={setInput} 
           handleSendMessage={handleSendMessage} 
           toggleProfile={toggleProfile} 
-          handlePromptClick={handlePromptClick} // Pass the new prop
+          handlePromptClick={handlePromptClick}
         />
       </div>
 
