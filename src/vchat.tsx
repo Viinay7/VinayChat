@@ -1,4 +1,4 @@
-const API_KEY: string = "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"; // Replace with actual API key
+const API_KEY: string = "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"; // Replace with actual API key
 const API_URL: string = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL: string = "openai/chatgpt-4o-latest";
 
