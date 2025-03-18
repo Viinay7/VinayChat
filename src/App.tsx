@@ -5,7 +5,7 @@ import Sidebar from "./components/Sidebar";
 import Profile from "./components/Profile";
 
 // API Configuration
-const API_KEY: string = "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"; // Replace with your actual API key
+const API_KEY: string = "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"; // Replace with your actual API key
 const API_URL: string = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL: string = "google/gemma-3-1b-it:free";
 
