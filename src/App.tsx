@@ -1,63 +1,37 @@
 import React, { useState } from "react";
-import { X, Menu } from "lucide-react";
 import ChatInterface from "./components/ChatInterface";
 import Sidebar from "./components/Sidebar";
 import Profile from "./components/Profile";
 
-// Load environment variables
-const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-const MODEL = import.meta.env.VITE_GEMMA_MODEL;
-const API_URL = "https://openrouter.ai/api/v1/chat/completions"; // 🔹 Fixed missing variable
-
-// Debugging: Check API Key and Model
-console.log("API Key:", API_KEY);
-console.log("Model:", MODEL);
-
-// Define message type
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
 
-// Function to fetch response from OpenRouter API
-async function getChatResponse(userMessage: string): Promise<string> {
-  const payload = {
-    model: MODEL,
-    messages: [{ role: "user", content: userMessage }],
-    max_tokens: 200,
-  };
-
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json(); // 🔹 Fixed JSON parsing issue
-    console.log("API Response:", data);
-
-    if (!response.ok) {
-      console.error("API Error Response:", data);
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    return data.choices[0].message.content;
-  } catch (error) {
-    console.error("Error fetching response:", error);
-    return "Error fetching response. Please try again.";
-  }
-}
-
 const App: React.FC = () => {
+  const [apiKey, setApiKey] = useState(localStorage.getItem("user_api_key") || "");
+  const [inputKey, setInputKey] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
 
+  // Save API Key
+  const handleSaveKey = () => {
+    if (inputKey.trim()) {
+      localStorage.setItem("user_api_key", inputKey);
+      setApiKey(inputKey);
+      setInputKey("");
+    }
+  };
+
+  // Remove API Key
+  const handleRemoveKey = () => {
+    localStorage.removeItem("user_api_key");
+    setApiKey("");
+  };
+
+  // Send User Message & Get AI Response
   const handleSendMessage = async () => {
     if (input.trim()) {
       const userMessage: ChatMessage = { role: "user", content: input };
@@ -69,41 +43,86 @@ const App: React.FC = () => {
     }
   };
 
-  const handlePromptClick = async (prompt: string) => {
-    setInput(prompt);
-    await handleSendMessage();
+  // Fetch AI Response
+  const getChatResponse = async (userMessage: string): Promise<string> => {
+    const userApiKey = localStorage.getItem("user_api_key"); // Get stored API key
+    if (!userApiKey) return "⚠️ API Key is missing! Please enter your key.";
+
+    const payload = {
+      model: "mistralai/mistral-7b-instruct", // Replace with a valid model
+      messages: [{ role: "user", content: userMessage }],
+      max_tokens: 200,
+    };
+
+    try {
+      console.log("Using API Key:", userApiKey); // Debugging
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userApiKey}`, // Ensure correct format
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content || "No response from AI.";
+    } catch (error) {
+      console.error("API request failed:", error);
+      return "⚠️ Error fetching response. Check API key and network.";
+    }
   };
 
+  // Toggle Profile Sidebar
+  const toggleProfile = () => {
+    setShowProfile(!showProfile);
+  };
+
+  // Start a New Chat
   const handleNewChat = () => {
     setMessages([]);
     setInput("");
   };
 
-  const toggleProfile = () => setShowProfile(!showProfile);
-  const toggleSidebar = () => setShowSidebar(!showSidebar);
-
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Mobile menu button */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-md"
-        onClick={toggleSidebar}
-      >
-        {showSidebar ? <X size={20} /> : <Menu size={20} />}
-      </button>
+      {/* API Key Input UI */}
+      {!apiKey ? (
+        <div className="p-4">
+          <input
+            type="text"
+            placeholder="Enter your API key"
+            value={inputKey}
+            onChange={(e) => setInputKey(e.target.value)}
+            className="border p-2"
+          />
+          <button onClick={handleSaveKey} className="ml-2 p-2 bg-blue-500 text-white">
+            Save API Key
+          </button>
+        </div>
+      ) : (
+        <div className="p-4">
+          <p>✅ API Key Set</p>
+          <button onClick={handleRemoveKey} className="ml-2 p-2 bg-red-500 text-white">
+            Remove API Key
+          </button>
+        </div>
+      )}
 
       {/* Sidebar */}
       <Sidebar showSidebar={showSidebar} handleNewChat={handleNewChat} />
 
-      {/* Main Chat Area */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${showSidebar ? "md:ml-64" : ""}`}>
-        <ChatInterface 
-          messages={messages} 
-          input={input} 
-          setInput={setInput} 
-          handleSendMessage={handleSendMessage} 
-          toggleProfile={toggleProfile} 
-          handlePromptClick={handlePromptClick}
+      {/* Chat Interface */}
+      <div className={`flex-1 flex flex-col ${showSidebar ? "md:ml-64" : ""}`}>
+        <ChatInterface
+          messages={messages}
+          input={input}
+          setInput={setInput}
+          handleSendMessage={handleSendMessage}
         />
       </div>
 
