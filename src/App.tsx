@@ -5,9 +5,9 @@ import Sidebar from "./components/Sidebar";
 import Profile from "./components/Profile";
 
 // API Configuration
-const API_KEY: string = "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"; // Replace with your actual API key
-const API_URL: string = "https://openrouter.ai/api/v1/chat/completions"; 
-const MODEL: string = "openai/chatgpt-4o-latest"; 
+const API_KEY: string = "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"; // Replace with your actual API key
+const API_URL: string = "https://openrouter.ai/api/v1/chat/completions";
+const MODEL: string = "google/gemma-3-1b-it:free";
 
 // Define message type
 interface ChatMessage {
@@ -15,11 +15,16 @@ interface ChatMessage {
   content: string;
 }
 
-// Function to fetch response from OpenRouter API
+// Function to fetch response from OpenRouter API (Google Gemma 3 1B)
 async function getChatResponse(userMessage: string): Promise<string> {
   const payload = {
     model: MODEL,
-    messages: [{ role: "user", content: userMessage }],
+    messages: [
+      {
+        role: "user",
+        content: [{ type: "text", text: userMessage }],
+      },
+    ],
     max_tokens: 200,
   };
 

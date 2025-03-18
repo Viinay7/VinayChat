@@ -1,21 +1,28 @@
-const API_KEY: string = "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"; // Replace with actual API key
+const API_KEY: string = "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"; // Replace with your actual API key
 const API_URL: string = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL: string = "openai/chatgpt-4o-latest";
+const MODEL: string = "google/gemma-3-1b-it:free";
+
 
 interface ChatMessage {
   role: string;
-  content: string;
+  content: { type: string; text?: string; image_url?: { url: string } }[];
 }
 
 interface APIResponse {
-  choices: { message: ChatMessage }[];
+  choices: { message: { role: string; content: string } }[];
 }
 
 // Function to call OpenRouter API
-async function getChatResponse(userMessage: string): Promise<string> {
+async function getChatResponse(userMessage: string, imageUrl?: string): Promise<string> {
+  const messageContent = [{ type: "text", text: userMessage }];
+  
+  if (imageUrl) {
+    messageContent.push({ type: "image_url", image_url: { url: imageUrl } });
+  }
+
   const payload = {
     model: MODEL,
-    messages: [{ role: "user", content: [{ type: "text", text: userMessage }] }],
+    messages: [{ role: "user", content: messageContent }],
     max_tokens: 200,
   };
 
@@ -24,7 +31,9 @@ async function getChatResponse(userMessage: string): Promise<string> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
+        "Authorization": `Bearer ${API_KEY}`,
+        "HTTP-Referer": SITE_URL,
+        "X-Title": SITE_NAME,
       },
       body: JSON.stringify(payload),
     });
@@ -45,8 +54,10 @@ async function getChatResponse(userMessage: string): Promise<string> {
 
 // Example usage
 async function main(): Promise<void> {
-  const userMessage: string = "Hello, how are you?";
-  const botResponse: string = await getChatResponse(userMessage);
+  const userMessage: string = "What is in this image?";
+  const imageUrl: string = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
+  
+  const botResponse: string = await getChatResponse(userMessage, imageUrl);
   console.log("Bot Response:", botResponse);
 }
 
