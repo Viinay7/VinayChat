@@ -1,13 +1,15 @@
+// filepath: [App.tsx](http://_vscodecontentref_/1)
 import React, { useState } from "react";
 import { X, Menu } from "lucide-react";
 import ChatInterface from "./components/ChatInterface";
 import Sidebar from "./components/Sidebar";
 import Profile from "./components/Profile";
 
-// API Configuration using environment variables
-const API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
-const API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = process.env.NEXT_PUBLIC_GEMMA_MODEL || "google/gemma-3-1b-it:free";
+// Load environment variables
+const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+const MODEL = import.meta.env.VITE_GEMMA_MODEL;
+
+
 
 // Debugging: Check API Key and Model (Remove this in production)
 console.log("API Key:", API_KEY ? "Loaded Successfully" : "Missing");
