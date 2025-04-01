@@ -181,7 +181,7 @@ const App: React.FC = () => {
               rel="noopener noreferrer"
               className="block text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 text-center transition-colors"
             >
-              Get Trending LLM's API keys here for→
+              Get Trending LLM's API keys here for free→
             </a>
           </div>
         ) : (
