@@ -1,10 +1,12 @@
-// filepath: /c:/Users/viina/Downloads/GPT/project/tailwind.config.js
-module.exports = {
+/** @type {import('tailwindcss').Config} */
+export default {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}", // Adjust the paths according to your project structure
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {},
   },
   plugins: [],
-};
+}

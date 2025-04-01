@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add smooth transitions for theme changes */
+* {
+  transition-property: color, background-color, border-color;
+  transition-duration: 200ms;
+}
+
+/* Mobile optimizations */
+html, body {
+  @apply h-full w-full overscroll-none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text size adjustment on orientation change for iOS */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Better scrolling on mobile */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Media query for small screens */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* Improve touch targets on mobile */
+button, input, a {
+  @apply outline-none;
+}
